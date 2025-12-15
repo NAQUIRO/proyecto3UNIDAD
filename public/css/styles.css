@@ -1,0 +1,876 @@
+/* ---------------------------
+   Estilos generales
+---------------------------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    color: #333;
+    background-color: #f8f9fa;
+    line-height: 1.6;
+}
+
+/* Contenedor general */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ---------------------------
+   Encabezado y navegación
+---------------------------- */
+header {
+    background-color: #0a3d62;
+    color: #fff;
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+/* --- Logo (imagen SVG o PNG) --- */
+.logo img {
+    height: 50px;
+    width: auto;
+    vertical-align: middle;
+}
+
+/* Compatibilidad con .encabezado en otras páginas */
+.encabezado .logo img {
+    height: 50px;
+    width: auto;
+    vertical-align: middle;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+    margin: 0;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: #ffbb33;
+}
+
+/* ---------------------------
+   Banner principal
+---------------------------- */
+.banner {
+    background: url('../img/banner.jpg') center/cover no-repeat;
+    color: #fff;
+    text-align: center;
+    padding: 120px 20px;
+    position: relative;
+}
+
+.banner::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.45);
+}
+
+.banner-text {
+    position: relative;
+    z-index: 1;
+}
+
+.banner h2 {
+    font-size: 2.2em;
+    margin-bottom: 15px;
+}
+
+.banner p {
+    font-size: 1.1em;
+}
+
+/* ---------------------------
+   Sección de eventos
+---------------------------- */
+.eventos {
+    padding: 60px 0;
+    background-color: #fff;
+    text-align: center;
+}
+
+.eventos h2 {
+    font-size: 2em;
+    margin-bottom: 40px;
+    color: #0a3d62;
+}
+
+.cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+}
+
+.card {
+    background: #f0f3f5;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 320px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+.card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.card h3 {
+    color: #0a3d62;
+    margin: 15px 0 5px;
+    font-size: 1.2em;
+}
+
+.card p {
+    padding: 0 15px 20px;
+    color: #555;
+}
+
+/* ---------------------------
+   Sección de beneficios
+---------------------------- */
+.beneficios {
+    padding: 60px 0;
+    background-color: #e8eef3;
+    text-align: center;
+}
+
+.beneficios h2 {
+    font-size: 2em;
+    margin-bottom: 40px;
+    color: #0a3d62;
+}
+
+.beneficios-lista {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+}
+
+.beneficio {
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    width: 300px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.beneficio:hover {
+    transform: translateY(-5px);
+}
+
+.beneficio h3 {
+    color: #ff8800;
+    margin-bottom: 10px;
+}
+
+/* ---------------------------
+   Pie de página
+---------------------------- */
+footer {
+    background-color: #0a3d62;
+    color: #fff;
+    text-align: center;
+    padding: 25px 10px;
+    margin-top: 40px;
+}
+
+footer p {
+    margin-bottom: 10px;
+}
+
+.social-links a {
+    color: #ffbb33;
+    text-decoration: none;
+    margin: 0 8px;
+    font-weight: 500;
+}
+
+.social-links a:hover {
+    text-decoration: underline;
+}
+
+/* ---------------------------
+   Responsive
+---------------------------- */
+@media (max-width: 768px) {
+    nav {
+        float: none;
+        margin-top: 10px;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .cards, .beneficios-lista {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .banner h2 {
+        font-size: 1.6em;
+    }
+}
+
+/* ===== PONENTES ===== */
+.ponentes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  padding: 2rem 10%;
+  background-color: #f8f9fa;
+}
+
+.tarjeta-ponente {
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tarjeta-ponente:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+.tarjeta-ponente img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+
+.tarjeta-ponente h3 {
+  margin: 1rem 0 0.3rem;
+  font-size: 1.3rem;
+  color: #0a3d62;
+  font-weight: 600;
+}
+
+.tarjeta-ponente .cargo {
+  color: #555;
+  font-size: 0.95rem;
+  margin-bottom: 0.3rem;
+}
+
+.tarjeta-ponente .tema {
+  color: #333;
+  font-size: 0.9rem;
+  font-style: italic;
+  margin-bottom: 1.2rem;
+}
+
+/* ===== TÍTULO DE SECCIÓN ===== */
+.titulo-seccion {
+  text-align: center;
+  padding: 3rem 10% 1rem;
+  background: linear-gradient(to right, #0a3d62, #145374);
+  color: white;
+}
+
+.titulo-seccion h1 {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.titulo-seccion p {
+  font-weight: 300;
+  font-size: 1.1rem;
+}
+
+/* === Estilos adicionales para noticias.html === */
+
+.hero-section {
+  text-align: center;
+  color: #fff;
+  padding: 100px 20px;
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-section h1 {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.hero-section p {
+  font-size: 1.1em;
+  opacity: 0.9;
+}
+
+.featured-news .featured-article h2 {
+  font-size: 1.8em;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+.featured-news .featured-article p {
+  font-size: 1em;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.featured-news .btn {
+  display: inline-block;
+  padding: 10px 18px;
+  background-color: #0057b7;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.featured-news .btn:hover {
+  background-color: #003f8a;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 1.8em;
+  color: #222;
+  margin-bottom: 20px;
+}
+
+.news-list .grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.news-list .card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.news-list .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+.news-list .card-content {
+  padding: 15px;
+}
+
+.news-list .card-content h3 {
+  font-size: 1.2em;
+  margin-bottom: 8px;
+  color: #222;
+}
+
+.news-list .card-content .date {
+  font-size: 0.9em;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.news-list .card-content p {
+  font-size: 0.95em;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.news-list .card-content .read-more {
+  text-decoration: none;
+  font-weight: 600;
+  color: #0057b7;
+  transition: color 0.3s;
+}
+
+.news-list .card-content .read-more:hover {
+  color: #003f8a;
+}
+
+/* ---------- HERO NOTICIAS ---------- */
+.hero-noticias {
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+              url('../img/banner-noticias.jpg') center/cover no-repeat;
+  color: #fff;
+  text-align: center;
+  padding: 120px 20px;
+}
+
+/* ---------- NOTICIA DESTACADA ---------- */
+.featured-article {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  align-items: center;
+  margin: 60px 0;
+}
+
+.featured-article img {
+  flex: 1 1 400px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 550px;
+}
+
+.featured-content {
+  flex: 1 1 300px;
+}
+
+.featured-content h2 {
+  margin-bottom: 15px;
+}
+
+/* ---------- LISTA DE NOTICIAS ---------- */
+.news-list .cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.news-list .card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.news-list .card:hover {
+  transform: translateY(-5px);
+}
+
+.news-list img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.news-list .card-content {
+  padding: 20px;
+}
+
+.news-list .date {
+  color: #777;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+}
+
+.news-list .read-more {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* ==== ESTILOS ESPECÍFICOS PARA EVENTOS ==== */
+
+.hero-section h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.hero-section p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+/* Tarjetas de eventos */
+.card {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+.event-title {
+  color: #333;
+  font-size: 1.4rem;
+  margin-bottom: 5px;
+}
+
+.event-date {
+  color: #777;
+  font-size: 0.95rem;
+  margin-bottom: 15px;
+}
+
+.toggle-btn {
+  display: inline-block;
+  margin-top: 15px;
+  background-color: #ff6600;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.toggle-btn:hover {
+  background-color: #e85c00;
+}
+
+/* Detalles del evento (inicialmente ocultos) */
+.event-details {
+  display: none;
+  margin-top: 15px;
+  background-color: #f9f9f9;
+  border-left: 4px solid #ff6600;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.5;
+}
+
+.event-details p {
+  margin-bottom: 6px;
+}
+
+/* ===== SECCIÓN EVENTOS ===== */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  justify-items: center;
+}
+
+/* Tarjetas de eventos */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  text-align: left;
+  max-width: 380px;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+}
+
+.card h2 {
+  font-size: 1.3rem;
+  color: #222;
+  margin-bottom: 8px;
+}
+
+.event-date {
+  color: #777;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+}
+
+.card p {
+  color: #555;
+  line-height: 1.5;
+}
+
+.event-details {
+  display: none;
+  margin-top: 15px;
+  background-color: #f9f9f9;
+  border-left: 3px solid #0078d4;
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+
+.event-details p {
+  margin: 5px 0;
+  font-size: 0.95rem;
+}
+
+/* Botón de detalles */
+.toggle-btn {
+  background-color: #ff6600;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 10px;
+  transition: background 0.3s ease;
+}
+
+.toggle-btn:hover {
+  background-color: #e65a00;
+}
+
+/* ===== BANNER EVENTOS ===== */
+.hero-eventos {
+  position: relative;
+  height: 350px;
+  background: url('../img/eventos/hero-events.jpg') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-align: center;
+  border-bottom: 4px solid #0078d4;
+  overflow: hidden;
+}
+
+.hero-eventos .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.hero-eventos .hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  padding: 0 20px;
+}
+
+.hero-eventos h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.hero-eventos p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+/* ===== PATROCINADORES ===== */
+.patrocinadores-section {
+  padding: 3rem 0;
+}
+
+.patrocinadores-section.alt-bg {
+  background-color: #f8f9fa;
+}
+
+.category-title {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #0a3d62;
+  margin-bottom: 2.5rem;
+  font-weight: 600;
+}
+
+/* Grid para patrocinadores principales (más grandes) */
+.patrocinadores-grid.principal {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Grid para patrocinadores oficiales */
+.patrocinadores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 0 20px;
+}
+
+/* Tarjeta de patrocinador */
+.patrocinador-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.patrocinador-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.logo-container {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.logo-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.patrocinador-card h3 {
+  font-size: 1.4rem;
+  color: #0a3d62;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.patrocinador-card .sector {
+  color: #ff8800;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.patrocinador-card .descripcion {
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Grid de colaboradores (solo logos) */
+.colaboradores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 2rem;
+  padding: 0 20px;
+  align-items: center;
+}
+
+.colaborador-logo {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  transition: transform 0.3s ease;
+}
+
+.colaborador-logo:hover {
+  transform: scale(1.05);
+}
+
+.colaborador-logo img {
+  max-width: 100%;
+  max-height: 80px;
+  object-fit: contain;
+  filter: grayscale(100%);
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.colaborador-logo:hover img {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+/* Llamado a la acción */
+.cta-patrocinio {
+  background: linear-gradient(135deg, #0a3d62 0%, #145374 100%);
+  color: #fff;
+  padding: 4rem 20px;
+  margin-top: 3rem;
+}
+
+.cta-content {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.cta-content h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.cta-content p {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.btn-cta {
+  display: inline-block;
+  background-color: #ffbb33;
+  color: #0a3d62;
+  padding: 12px 35px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.btn-cta:hover {
+  background-color: #ff8800;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .category-title {
+    font-size: 1.5rem;
+  }
+  
+  .patrocinadores-grid.principal,
+  .patrocinadores-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .colaboradores-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .cta-content h2 {
+    font-size: 1.6rem;
+  }
+}
