@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "../../../Downloads/AD_producto"
+		},
+		{
+			"path": "../css"
+		},
+		{
+			"path": "../iconos"
+		},
+		{
+			"path": "../img"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "css"
+	}
+}
