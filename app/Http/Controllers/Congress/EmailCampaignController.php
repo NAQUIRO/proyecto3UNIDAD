@@ -3,17 +3,19 @@
 namespace App\Http\Controllers\Congress;
 
 use App\Http\Controllers\Controller;
+use App\Services\BulkEmailService;
 use App\Models\Congress;
 use App\Models\EmailCampaign;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 
 class EmailCampaignController extends Controller
 {
-    public function __construct()
+    protected BulkEmailService $bulkEmailService;
+
+    public function __construct(BulkEmailService $bulkEmailService)
     {
         $this->middleware('auth');
+        $this->bulkEmailService = $bulkEmailService;
     }
 
     /**
@@ -61,6 +63,7 @@ class EmailCampaignController extends Controller
             'subject' => 'required|string|max:255',
             'content' => 'required|string',
             'segment_type' => 'required|in:all,attendees,speakers,accepted_speakers,reviewers,custom',
+            'segment_filters' => 'nullable|array',
             'scheduled_at' => 'nullable|date|after:now',
         ]);
 
@@ -70,9 +73,14 @@ class EmailCampaignController extends Controller
 
         $campaign = EmailCampaign::create($validated);
 
-        // Preparar destinatarios
-        $recipients = $this->getRecipients($congress, $validated['segment_type']);
+        // Preparar destinatarios usando el servicio
+        $recipients = $this->bulkEmailService->prepareRecipients(
+            $congress,
+            $validated['segment_type'],
+            $validated['segment_filters'] ?? null
+        );
 
+        // Crear registros de destinatarios
         foreach ($recipients as $recipient) {
             $campaign->recipients()->create([
                 'user_id' => $recipient->id,
@@ -85,8 +93,8 @@ class EmailCampaignController extends Controller
         $campaign->update(['total_recipients' => count($recipients)]);
 
         if (!$request->scheduled_at) {
-            return redirect()->route('congress.email-campaigns.send', [$congress, $campaign])
-                ->with('success', 'Campaña creada. ¿Deseas enviarla ahora?');
+            return redirect()->route('congress.email-campaigns.show', [$congress, $campaign])
+                ->with('success', 'Campaña creada. Puedes enviarla desde aquí.');
         }
 
         return redirect()->route('congress.email-campaigns.show', [$congress, $campaign])
@@ -109,7 +117,7 @@ class EmailCampaignController extends Controller
     }
 
     /**
-     * Send campaign
+     * Send campaign (usando jobs con chunks)
      */
     public function send(Congress $congress, EmailCampaign $campaign)
     {
@@ -122,53 +130,24 @@ class EmailCampaignController extends Controller
             return back()->with('error', 'Esta campaña ya fue enviada.');
         }
 
-        $campaign->update(['status' => 'sending']);
-
-        $sentCount = 0;
-        $failedCount = 0;
-
-        foreach ($campaign->recipients()->where('status', 'pending')->get() as $recipient) {
-            try {
-                Mail::send([], [], function ($message) use ($campaign, $recipient) {
-                    $message->to($recipient->email, $recipient->name)
-                        ->subject($campaign->subject)
-                        ->html($campaign->content);
-                });
-
-                $recipient->markAsSent();
-                $sentCount++;
-            } catch (\Exception $e) {
-                $recipient->markAsFailed($e->getMessage());
-                $failedCount++;
-            }
-        }
-
-        $campaign->update([
-            'status' => 'sent',
-            'sent_count' => $sentCount,
-            'failed_count' => $failedCount,
-            'sent_at' => now(),
-        ]);
+        // Enviar usando el servicio (procesa en chunks y encola jobs)
+        $this->bulkEmailService->sendCampaign($campaign, 50);
 
         return redirect()->route('congress.email-campaigns.show', [$congress, $campaign])
-            ->with('success', "Campaña enviada. {$sentCount} exitosos, {$failedCount} fallidos.");
+            ->with('success', 'Campaña en proceso de envío. Los correos se enviarán de forma asíncrona.');
     }
 
     /**
-     * Get recipients based on segment type
+     * Actualizar estadísticas de la campaña
      */
-    private function getRecipients(Congress $congress, string $segmentType): \Illuminate\Database\Eloquent\Collection
+    public function updateStats(Congress $congress, EmailCampaign $campaign)
     {
-        return match ($segmentType) {
-            'all' => $congress->users()->get(),
-            'attendees' => $congress->users()->wherePivot('role', 'attendee')->get(),
-            'speakers' => $congress->users()->wherePivot('role', 'speaker')->get(),
-            'accepted_speakers' => User::whereHas('papers', function($q) use ($congress) {
-                $q->where('congress_id', $congress->id)
-                  ->where('status', 'accepted');
-            })->get(),
-            'reviewers' => $congress->reviewers()->get(),
-            default => collect(),
-        };
+        $this->bulkEmailService->updateCampaignStats($campaign);
+
+        return response()->json([
+            'sent_count' => $campaign->sent_count,
+            'failed_count' => $campaign->failed_count,
+            'status' => $campaign->status,
+        ]);
     }
 }

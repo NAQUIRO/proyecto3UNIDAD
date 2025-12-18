@@ -82,6 +82,26 @@ img {
     padding: 4rem 0;
 }
 
+.titulo-seccion {
+    background: var(--light-bg);
+    padding: 3rem 0;
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.titulo-seccion h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--primary-color);
+}
+
+.titulo-seccion p {
+    font-size: 1.1rem;
+    color: #64748b;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
 .text-center {
     text-align: center;
 }

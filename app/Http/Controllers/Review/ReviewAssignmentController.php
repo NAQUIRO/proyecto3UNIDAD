@@ -8,14 +8,18 @@ use App\Models\Congress;
 use App\Models\Paper;
 use App\Models\ReviewAssignment;
 use App\Models\User;
+use App\Services\ReviewerAssignmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class ReviewAssignmentController extends Controller
 {
-    public function __construct()
+    protected ReviewerAssignmentService $assignmentService;
+
+    public function __construct(ReviewerAssignmentService $assignmentService)
     {
         $this->middleware('auth');
+        $this->assignmentService = $assignmentService;
     }
 
     /**
@@ -34,8 +38,7 @@ class ReviewAssignmentController extends Controller
             ->paginate(20);
 
         $papers = $congress->papers()
-            ->where('status', 'submitted')
-            ->orWhere('status', 'under_review')
+            ->whereIn('status', ['submitted', 'under_review'])
             ->with('author', 'thematicArea')
             ->get();
 
@@ -45,7 +48,7 @@ class ReviewAssignmentController extends Controller
     }
 
     /**
-     * Store a newly created assignment
+     * Store a newly created assignment (manual)
      */
     public function store(Request $request, Congress $congress, Paper $paper)
     {
@@ -60,48 +63,60 @@ class ReviewAssignmentController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        // Verificar que el revisor sea revisor del congreso
-        $reviewer = User::find($validated['reviewer_id']);
-        if (!$reviewer->isReviewerForCongress($congress->id)) {
-            return back()->with('error', 'El usuario seleccionado no es revisor de este congreso.');
+        $deadline = $validated['deadline'] ? new \DateTime($validated['deadline']) : null;
+
+        $assignment = $this->assignmentService->assignManually(
+            $paper,
+            [$validated['reviewer_id']],
+            $deadline,
+            $validated['notes'] ?? null
+        );
+
+        if (empty($assignment)) {
+            return back()->with('error', 'No se pudo crear la asignación. Verifica que el revisor sea válido y no tenga una asignación activa.');
         }
-
-        // Verificar que no haya una asignación pendiente o aceptada
-        $existingAssignment = ReviewAssignment::where('paper_id', $paper->id)
-            ->where('reviewer_id', $validated['reviewer_id'])
-            ->whereIn('status', ['pending', 'accepted'])
-            ->first();
-
-        if ($existingAssignment) {
-            return back()->with('error', 'Ya existe una asignación activa para este revisor y paper.');
-        }
-
-        $validated['congress_id'] = $congress->id;
-        $validated['paper_id'] = $paper->id;
-        $validated['assigned_by'] = auth()->id();
-        $validated['assigned_at'] = now();
-
-        $assignment = ReviewAssignment::create($validated);
-
-        // Crear el review asociado
-        $assignment->review()->create([
-            'paper_id' => $paper->id,
-            'reviewer_id' => $validated['reviewer_id'],
-            'review_assignment_id' => $assignment->id,
-            'status' => 'pending',
-            'is_blind_review' => true,
-            'assigned_at' => now(),
-        ]);
-
-        // Actualizar estado del paper
-        if ($paper->status === 'submitted') {
-            $paper->update(['status' => 'under_review', 'review_status' => 'in_progress']);
-        }
-
-        // Enviar notificación por email al revisor
-        Mail::to($reviewer->email)->send(new ReviewAssignmentMail($assignment));
 
         return back()->with('success', 'Revisor asignado exitosamente.');
+    }
+
+    /**
+     * Asignar revisores automáticamente por área temática
+     */
+    public function assignAuto(Request $request, Congress $congress, Paper $paper)
+    {
+        // Solo admins del congreso pueden asignar
+        if (!auth()->user()->hasRole(['Super Admin', 'Admin'])) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'number_of_reviewers' => 'nullable|integer|min:1|max:5',
+        ]);
+
+        $numberOfReviewers = $validated['number_of_reviewers'] ?? 2;
+
+        $assignments = $this->assignmentService->assignByThematicArea($paper, $numberOfReviewers);
+
+        if (empty($assignments)) {
+            return back()->with('error', 'No se encontraron revisores disponibles para el área temática de este paper.');
+        }
+
+        return back()->with('success', count($assignments) . ' revisor(es) asignado(s) automáticamente.');
+    }
+
+    /**
+     * Obtener sugerencias de revisores
+     */
+    public function suggestReviewers(Congress $congress, Paper $paper)
+    {
+        // Solo admins del congreso pueden ver sugerencias
+        if (!auth()->user()->hasRole(['Super Admin', 'Admin'])) {
+            abort(403);
+        }
+
+        $suggestions = $this->assignmentService->suggestReviewers($paper, 10);
+
+        return response()->json($suggestions->values());
     }
 
     /**

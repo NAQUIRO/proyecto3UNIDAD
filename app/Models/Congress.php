@@ -27,11 +27,36 @@ class Congress extends Model
         'meta_description',
         'meta_keywords',
         'created_by',
+        // Multi-tenancy fields
+        'custom_domain',
+        'use_custom_domain',
+        'subdomain',
+        // Visual configuration
+        'primary_color',
+        'secondary_color',
+        'accent_color',
+        'font_family',
+        'favicon',
+        // Multi-tenancy settings
+        'is_active',
+        'settings',
+        'timezone',
+        'locale',
+        // Location
+        'location',
+        'address',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
+        'use_custom_domain' => 'boolean',
+        'is_active' => 'boolean',
+        'settings' => 'array',
+        'latitude' => 'decimal:8',
+        'longitude' => 'decimal:8',
     ];
 
     protected static function boot()

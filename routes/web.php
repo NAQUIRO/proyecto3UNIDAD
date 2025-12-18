@@ -47,6 +47,9 @@ Route::post('/newsletter', [NewsletterController::class, 'store'])->name('newsle
 // Rutas del sitio público
 Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
 Route::get('/ponentes', [PonenteController::class, 'index'])->name('ponentes.index');
+Route::get('/ponentes/{speaker}', [PonenteController::class, 'show'])->name('ponentes.show');
+Route::get('/patrocinadores', [PatrocinadorController::class, 'index'])->name('patrocinadores.index');
+Route::get('/patrocinadores/{sponsor}', [PatrocinadorController::class, 'show'])->name('patrocinadores.show');
 Route::get('/patrocinadores', [PatrocinadorController::class, 'index'])->name('patrocinadores.index');
 Route::get('/noticias', [NoticiaController::class, 'index'])->name('noticias.index');
 Route::get('/contacto', [ContactoController::class, 'index'])->name('contacto.index');
@@ -171,6 +174,8 @@ Route::middleware(['auth', 'verified'])->prefix('congress/{congress}')->name('co
     // Asignación de revisores
     Route::get('review-assignments', [ReviewAssignmentController::class, 'index'])->name('review-assignments.index');
     Route::post('papers/{paper}/review-assignments', [ReviewAssignmentController::class, 'store'])->name('review-assignments.store');
+    Route::post('papers/{paper}/review-assignments/auto', [ReviewAssignmentController::class, 'assignAuto'])->name('review-assignments.assign-auto');
+    Route::get('papers/{paper}/review-assignments/suggest', [ReviewAssignmentController::class, 'suggestReviewers'])->name('review-assignments.suggest');
     Route::post('review-assignments/{assignment}/accept', [ReviewAssignmentController::class, 'accept'])->name('review-assignments.accept');
     Route::post('review-assignments/{assignment}/reject', [ReviewAssignmentController::class, 'reject'])->name('review-assignments.reject');
     Route::delete('review-assignments/{assignment}', [ReviewAssignmentController::class, 'destroy'])->name('review-assignments.destroy');
@@ -184,6 +189,7 @@ Route::middleware(['auth', 'verified'])->prefix('congress/{congress}')->name('co
     Route::get('symposia/{symposium}', [SymposiumController::class, 'show'])->name('symposia.show');
     
     // Sesiones virtuales
+    Route::get('agenda', [\App\Http\Controllers\AgendaController::class, 'index'])->name('agenda');
     Route::get('virtual-sessions', [VirtualSessionController::class, 'index'])->name('virtual-sessions.index');
     Route::get('virtual-sessions/{session}', [VirtualSessionController::class, 'show'])->name('virtual-sessions.show');
     
@@ -203,6 +209,8 @@ Route::middleware(['auth', 'verified'])->prefix('congress/{congress}')->name('co
     Route::get('registration/{registration}/payment', [PaymentController::class, 'create'])->name('payment.create');
     Route::post('registration/{registration}/payment', [PaymentController::class, 'store'])->name('payment.store');
     Route::get('payment/{payment}', [PaymentController::class, 'show'])->name('payment.show');
+    Route::get('payment/{payment}/receipt', [PaymentController::class, 'generateReceipt'])->name('payment.receipt');
+    Route::get('payment/{payment}/receipt/download', [PaymentController::class, 'downloadReceipt'])->name('payment.receipt.download');
     Route::post('payment/webhook/{provider}', [PaymentController::class, 'webhook'])->name('payment.webhook');
     
     // Blog del evento
@@ -215,6 +223,7 @@ Route::middleware(['auth', 'verified'])->prefix('congress/{congress}')->name('co
     Route::post('email-campaigns', [EmailCampaignController::class, 'store'])->name('email-campaigns.store');
     Route::get('email-campaigns/{campaign}', [EmailCampaignController::class, 'show'])->name('email-campaigns.show');
     Route::post('email-campaigns/{campaign}/send', [EmailCampaignController::class, 'send'])->name('email-campaigns.send');
+    Route::get('email-campaigns/{campaign}/stats', [EmailCampaignController::class, 'updateStats'])->name('email-campaigns.stats');
     
     // Certificados
     Route::post('certificate/validate', [CertificateController::class, 'validateAndGenerate'])->name('certificate.validate');
@@ -223,6 +232,13 @@ Route::middleware(['auth', 'verified'])->prefix('congress/{congress}')->name('co
 });
 
 // Rutas de usuario (requieren autenticación)
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard para usuarios regulares
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+});
+
 Route::middleware(['auth', 'verified'])->prefix('user')->name('user.')->group(function () {
     // Datos de facturación
     Route::resource('billing-data', BillingDataController::class);

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -44,8 +45,15 @@ class RegisteredUserController extends Controller
         ]);
 
         // Asignar rol según el tipo de usuario
-        $role = $request->user_type === 'speaker' ? 'Ponente' : 'Asistente';
-        $user->assignRole($role);
+        $roleName = $request->user_type === 'speaker' ? 'Ponente' : 'Asistente';
+        
+        try {
+            $user->assignRole($roleName);
+        } catch (\Spatie\Permission\Exceptions\RoleDoesNotExist $e) {
+            // Si el rol no existe, crearlo y asignarlo
+            Role::firstOrCreate(['name' => $roleName]);
+            $user->assignRole($roleName);
+        }
 
         event(new Registered($user));
 

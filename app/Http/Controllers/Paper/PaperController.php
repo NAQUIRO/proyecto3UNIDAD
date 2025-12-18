@@ -242,8 +242,8 @@ class PaperController extends Controller
 
         $paper->submit();
 
-        // Enviar notificación por email
-        Mail::to($paper->author->email)->send(new PaperSubmittedMail($paper));
+        // Despachar job de notificación (usando queue)
+        \App\Jobs\SendPaperSubmittedNotificationJob::dispatch($paper);
 
         return redirect()->route('paper.show', [$congress, $paper])
             ->with('success', 'Propuesta enviada exitosamente. Será revisada por el comité científico.');

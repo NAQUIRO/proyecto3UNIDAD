@@ -1,176 +1,422 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dashboard Administrativo') }}
-        </h2>
-    </x-slot>
+@extends('layouts.public')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Estadísticas -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
-                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Congresos</p>
-                                <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $stats['total_congresses'] }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+@section('title', 'Dashboard Admin - EventHub')
 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
-                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Publicados</p>
-                                <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $stats['published_congresses'] }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+    .dashboard-container {
+        min-height: 100vh;
+        background: #f5f7fa;
+        padding: 30px 0;
+    }
+    .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        height: 100%;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    .stat-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    .stat-label {
+        font-size: 1rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .quick-actions {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-top: 30px;
+    }
+    .action-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        transition: background 0.3s;
+    }
+    .action-card:hover {
+        background: #e9ecef;
+    }
+    .action-card a {
+        text-decoration: none;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .action-card i {
+        font-size: 1.5rem;
+        color: #667eea;
+    }
+    .chart-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    .chart-header {
+        padding: 20px;
+        color: white;
+        font-weight: 600;
+    }
+    .chart-header.bg-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .chart-header.bg-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    }
+    .chart-body {
+        padding: 20px;
+    }
+</style>
+@endpush
 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
-                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Áreas Temáticas</p>
-                                <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $stats['total_thematic_areas'] }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+@section('content')
+<div class="dashboard-container">
+    <div class="container">
+        <!-- Header del Dashboard -->
+        <div class="dashboard-header">
+            <h1><i class="fas fa-tachometer-alt"></i> Panel de Administración</h1>
+            <p class="mb-0">Bienvenido, {{ Auth::user()->name }}</p>
+        </div>
 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
-                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Borradores</p>
-                                <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $stats['draft_congresses'] }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Mensajes Flash -->
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-gray-500 rounded-md p-3">
-                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Finalizados</p>
-                                <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $stats['finished_congresses'] }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
-                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Usuarios</p>
-                                <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $stats['total_users'] }}</p>
-                            </div>
-                        </div>
+        <!-- Tarjetas de Estadísticas -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon text-primary">
+                        <i class="fas fa-calendar-alt"></i>
                     </div>
+                    <div class="stat-number">{{ $stats['total_congresses'] }}</div>
+                    <div class="stat-label">Congresos Totales</div>
                 </div>
             </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon text-success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-number">{{ $stats['published_congresses'] }}</div>
+                    <div class="stat-label">Congresos Publicados</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon text-warning">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="stat-number">{{ $stats['draft_congresses'] }}</div>
+                    <div class="stat-label">Borradores</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon text-info">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="stat-number">{{ $stats['total_thematic_areas'] }}</div>
+                    <div class="stat-label">Áreas Temáticas</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon text-success">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-number">{{ $stats['total_users'] }}</div>
+                    <div class="stat-label">Usuarios Registrados</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon text-secondary">
+                        <i class="fas fa-flag-checkered"></i>
+                    </div>
+                    <div class="stat-number">{{ $stats['finished_congresses'] }}</div>
+                    <div class="stat-label">Congresos Finalizados</div>
+                </div>
+            </div>
+        </div>
 
-            <!-- Congresos Recientes -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Congresos Recientes</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Título</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Estado</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Fechas</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                @forelse($recentCongresses as $congress)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $congress->title }}</div>
-                                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                @foreach($congress->thematicAreas as $area)
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                                        {{ $area->name }}
-                                                    </span>
-                                                @endforeach
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($congress->status === 'published')
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                                    Publicado
-                                                </span>
-                                            @elseif($congress->status === 'draft')
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                                                    Borrador
-                                                </span>
-                                            @else
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
-                                                    Finalizado
-                                                </span>
-                                            @endif
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                            {{ $congress->start_date->format('d/m/Y') }} - {{ $congress->end_date->format('d/m/Y') }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <a href="{{ route('admin.congresses.show', $congress) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">Ver</a>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                                            No hay congresos registrados aún.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+        <!-- Accesos Rápidos -->
+        <div class="quick-actions">
+            <h3 class="mb-4"><i class="fas fa-bolt"></i> Accesos Rápidos</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="action-card">
+                        <a href="{{ route('admin.congresses.index') }}">
+                            <div>
+                                <h5><i class="fas fa-calendar-plus"></i> Gestión de Congresos</h5>
+                                <p class="mb-0 text-muted">Crear, editar y eliminar congresos</p>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="action-card">
+                        <a href="{{ route('admin.thematic-areas.index') }}">
+                            <div>
+                                <h5><i class="fas fa-tags"></i> Áreas Temáticas</h5>
+                                <p class="mb-0 text-muted">Administrar áreas temáticas</p>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="action-card">
+                        <a href="{{ route('admin.profile.edit') }}">
+                            <div>
+                                <h5><i class="fas fa-user-cog"></i> Mi Perfil</h5>
+                                <p class="mb-0 text-muted">Editar información personal</p>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="action-card">
+                        <a href="{{ route('admin.congresses.index') }}">
+                            <div>
+                                <h5><i class="fas fa-list"></i> Ver Todos los Congresos</h5>
+                                <p class="mb-0 text-muted">Gestionar todos los congresos</p>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="action-card">
+                        <a href="{{ route('admin.transactions.index') }}">
+                            <div>
+                                <h5><i class="fas fa-dollar-sign"></i> Transacciones</h5>
+                                <p class="mb-0 text-muted">Ver y gestionar transacciones</p>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <!-- Gráficas -->
+        <div class="row g-4 mt-4">
+            <div class="col-md-6">
+                <div class="chart-card">
+                    <div class="chart-header bg-primary">
+                        <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Estado de Congresos</h5>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="chartEstadoCongresos" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-card">
+                    <div class="chart-header bg-success">
+                        <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Distribución de Estados</h5>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="chartDistribucion" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Congresos Recientes -->
+        <div class="chart-card mt-4">
+            <div class="chart-header bg-primary">
+                <h5 class="mb-0"><i class="fas fa-list"></i> Congresos Recientes</h5>
+            </div>
+            <div class="chart-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Estado</th>
+                                <th>Fechas</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentCongresses as $congress)
+                                <tr>
+                                    <td>
+                                        <strong>{{ $congress->title }}</strong><br>
+                                        <small class="text-muted">
+                                            @foreach($congress->thematicAreas as $area)
+                                                <span class="badge bg-primary">{{ $area->name }}</span>
+                                            @endforeach
+                                        </small>
+                                    </td>
+                                    <td>
+                                        @if($congress->status === 'published')
+                                            <span class="badge bg-success">Publicado</span>
+                                        @elseif($congress->status === 'draft')
+                                            <span class="badge bg-warning">Borrador</span>
+                                        @else
+                                            <span class="badge bg-secondary">Finalizado</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{ \Carbon\Carbon::parse($congress->start_date)->format('d/m/Y') }} - 
+                                        {{ \Carbon\Carbon::parse($congress->end_date)->format('d/m/Y') }}
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('admin.congresses.show', $congress) }}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">
+                                        No hay congresos registrados aún.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-</x-app-layout>
+</div>
+@endsection
 
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Gráfica de estado de congresos
+    const ctxEstado = document.getElementById('chartEstadoCongresos');
+    if (ctxEstado) {
+        new Chart(ctxEstado, {
+            type: 'bar',
+            data: {
+                labels: ['Publicados', 'Borradores', 'Finalizados'],
+                datasets: [{
+                    label: 'Congresos',
+                    data: [
+                        {{ $stats['published_congresses'] }},
+                        {{ $stats['draft_congresses'] }},
+                        {{ $stats['finished_congresses'] }}
+                    ],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.8)',
+                        'rgba(255, 193, 7, 0.8)',
+                        'rgba(108, 117, 125, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(108, 117, 125, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
 
-
-
+    // Gráfica de distribución
+    const ctxDistribucion = document.getElementById('chartDistribucion');
+    if (ctxDistribucion) {
+        new Chart(ctxDistribucion, {
+            type: 'doughnut',
+            data: {
+                labels: ['Publicados', 'Borradores', 'Finalizados'],
+                datasets: [{
+                    data: [
+                        {{ $stats['published_congresses'] }},
+                        {{ $stats['draft_congresses'] }},
+                        {{ $stats['finished_congresses'] }}
+                    ],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.8)',
+                        'rgba(255, 193, 7, 0.8)',
+                        'rgba(108, 117, 125, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(108, 117, 125, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+</script>
+@endpush

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Builder;
 
 class Sponsor extends Model
 {
@@ -24,6 +25,9 @@ class Sponsor extends Model
         'is_active' => 'boolean',
         'sort_order' => 'integer',
     ];
+
+    // Optimización: Eager loading por defecto
+    protected $with = ['congress'];
 
     public function congress(): BelongsTo
     {
@@ -48,5 +52,17 @@ class Sponsor extends Model
             'partner' => 'Socio',
             default => 'Socio',
         };
+    }
+
+    // Optimización: Scope para activos
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('is_active', true);
+    }
+
+    // Optimización: Scope para tipo
+    public function scopeOfType(Builder $query, string $type): Builder
+    {
+        return $query->where('sponsor_type', $type);
     }
 }

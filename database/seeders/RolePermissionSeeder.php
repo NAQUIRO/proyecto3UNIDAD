@@ -32,6 +32,21 @@ class RolePermissionSeeder extends Seeder
             'edit congresses',
             'delete congresses',
             'publish congresses',
+            'manage congress settings',
+            
+            // Papers/Ponencias
+            'view papers',
+            'create papers',
+            'edit papers',
+            'delete papers',
+            'review papers',
+            'assign reviewers',
+            
+            // Inscripciones
+            'view registrations',
+            'create registrations',
+            'edit registrations',
+            'delete registrations',
             
             // Usuarios
             'view users',
@@ -45,15 +60,25 @@ class RolePermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
         // Crear roles
-        $superAdminRole = Role::create(['name' => 'Super Admin']);
-        $superAdminRole->givePermissionTo(Permission::all());
+        $superAdminRole = Role::firstOrCreate(['name' => 'Super Admin']);
+        $superAdminRole->syncPermissions(Permission::all());
 
-        $adminRole = Role::create(['name' => 'Admin']);
-        $adminRole->givePermissionTo([
+        $organizerRole = Role::firstOrCreate(['name' => 'Organizador']);
+        $organizerRole->syncPermissions([
+            'view dashboard',
+            'view thematic areas',
+            'view congresses',
+            'create congresses',
+            'edit congresses',
+            'publish congresses',
+        ]);
+
+        $adminRole = Role::firstOrCreate(['name' => 'Admin']);
+        $adminRole->syncPermissions([
             'view dashboard',
             'view thematic areas',
             'create thematic areas',
@@ -66,19 +91,27 @@ class RolePermissionSeeder extends Seeder
             'publish congresses',
         ]);
 
-        $reviewerRole = Role::create(['name' => 'Revisor']);
-        $reviewerRole->givePermissionTo([
+        $reviewerRole = Role::firstOrCreate(['name' => 'Revisor']);
+        $reviewerRole->syncPermissions([
             'view congresses',
         ]);
 
-        $speakerRole = Role::create(['name' => 'Ponente']);
-        $speakerRole->givePermissionTo([
+        $authorRole = Role::firstOrCreate(['name' => 'Autor']);
+        $authorRole->syncPermissions([
             'view congresses',
         ]);
 
-        $attendeeRole = Role::create(['name' => 'Asistente']);
-        $attendeeRole->givePermissionTo([
+        $attendeeRole = Role::firstOrCreate(['name' => 'Asistente']);
+        $attendeeRole->syncPermissions([
             'view congresses',
+        ]);
+
+        $speakerRole = Role::firstOrCreate(['name' => 'Ponente']);
+        $speakerRole->syncPermissions([
+            'view congresses',
+            'create papers',
+            'view papers',
+            'edit papers',
         ]);
 
         // Crear usuario Super Admin por defecto
